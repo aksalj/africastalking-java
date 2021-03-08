@@ -1,113 +1,32 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.3'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+group = 'com.renta.backend'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
 
-buildscript {
-	repositories {
-	    jcenter()
-        maven {
-            url 'https://plugins.gradle.org/m2/'
-        }
-	}
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath 'gradle.plugin.de.fuerstenau:BuildConfigPlugin:1.1.8'
+repositories {
+	mavenCentral()
+	maven {
+        url  "http://dl.bintray.com/africastalking/java"
     }
 }
 
+dependencies {
 
-allprojects {
-    repositories {
-        jcenter()
-    }
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'com.africastalking:core:3.4.6'
+	implementation 'com.africastalking:com.africastalking:3.4.2'
+	 //implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	
 }
 
-Set<String> publishedLibs = new HashSet<String>()
-publishedLibs << 'sms'
-publishedLibs << 'payment'
-publishedLibs << 'token'
-publishedLibs << 'airtime'
-publishedLibs << 'voice'
-publishedLibs << 'ussd'
-publishedLibs << 'account'
-publishedLibs << 'core'
-publishedLibs << 'server'
-configure(subprojects.findAll {publishedLibs.contains(it.name)}){
-    group properties.getProperty("bintray.groupId")
-    version properties.getProperty("bintray.version")
-
-    apply plugin: 'java'
-    apply plugin: "maven-publish"
-    apply plugin: 'com.jfrog.bintray'
-    apply plugin: 'com.github.johnrengelman.shadow'
-
-    targetCompatibility = 1.8
-    sourceCompatibility = 1.8
-
-    jar {
-        manifest {
-            attributes 'Implementation-Title': 'Africa\'s Talking SDK',
-                    'Implementation-Version': version
-        }
-    }
-
-    javadoc {
-        source = sourceSets.main.allJava
-        classpath = configurations.compile
-        options {
-            links "http://docs.oracle.com/javase/7/docs/api/"
-        }
-    }
-
-    task sourcesJar(type: Jar) {
-        from sourceSets.main.allJava
-        classifier = 'sources'
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    shadowJar {
-        classifier = null // Avoid classifiers for now...
-    }
-
-    artifacts {
-        archives javadocJar
-        archives sourcesJar
-    }
-
-    publishing {
-        publications {
-            SDK(MavenPublication) {
-                artifact shadowJar
-                groupId properties.getProperty("bintray.groupId")
-                artifactId project.name
-                version project.version
-            }
-        }
-    }
-
-    bintray {
-        dryRun = false
-        publish = true
-        user = properties.getProperty("bintray.user")
-        key = properties.getProperty("bintray.key")
-        publications = ['SDK']
-        pkg {
-            repo = properties.getProperty("bintray.repo")
-            name = properties.getProperty("bintray.package")
-            userOrg = properties.getProperty("bintray.organization")
-            vcsUrl = properties.getProperty("bintray.vcsUrl")
-            licenses = ['MIT']
-            version {
-                name = project.version
-                desc = 'Africa\'s Talking SDK'
-                released  = new Date()
-                attributes = ['maturity': 'Development']
-            }
-        }
-    }
+test {
+	useJUnitPlatform()
 }
