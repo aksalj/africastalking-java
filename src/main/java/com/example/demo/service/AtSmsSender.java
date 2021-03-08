@@ -35,7 +35,7 @@ public class AtSmsSender implements SmsSender {
 		
 		if(isPhoneNumberValid(smsRequest.getRecipients())) {
 			
-			String from = "88881";
+			String from = "XXXXX";
 			String message = smsRequest.getMessage();
 			String[] recipients = smsRequest.getRecipients();
 			
